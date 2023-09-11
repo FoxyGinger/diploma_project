@@ -1,0 +1,12 @@
+server: "https://api.kinopoisk.dev"
+version: "v1"
+token: "4F1NQKQ-NH2M1C2-JWKVHR0-XW9DF0J"
+response_schemas_folder: "response_schemas"
+urls:
+  random: "movie/random"
+  poss_val_by_field: "movie/possible-values-by-field"
+  movie: "movie"
+  season: "season"
+  review: "review"
+  person: "person"
+  image: "image"
