@@ -1,13 +1,31 @@
 import pytest
 import requests
-import httpx
+import allure
 
 from kinopoisk.schema_checker import SchemaChecker
 
 
+class ResponseKp:
+    response: requests.Response
+    endpoint: str
+
+    def __init__(self, response: requests.Response, endpoint: str):
+        self.response = response
+        self.endpoint = endpoint
+
+    def status_code(self) -> int:
+        return self.status_code()
+
+    def url(self) -> str:
+        return self.response.url
+
+    def json(self) -> dict:
+        return self.response.json()
+
+
 class Kinopoisk:
     __main_url: str
-    __urls: dict
+    __endpoints: dict
     __token: str
     __schema_checker: SchemaChecker
 
@@ -17,30 +35,36 @@ class Kinopoisk:
         api_version = config.get("version")
         self.__main_url = f"{server}/{api_version}"
         self.__token = config.get("token")
-        self.__urls = config.get("urls")
+        self.__endpoints = config.get("endpoints")
         self.__schema_checker = SchemaChecker(config.get("response_schemas_folder"), api_version)
 
-    def __get(self, url: str, params: dict = None, token: str = None) -> requests.Response:
-        if token is None:
-            token = self.__token
+    def __get(self, endpoint: str, params: dict = None, invalid_token: bool = False) -> ResponseKp:
+        token = self.__token if not invalid_token else "12345678987654321"
 
-        full_url = f"{self.__main_url}/{self.__urls.get(url)}"
-        return requests.get(url=full_url, params=params, headers={
+        full_url = f"{self.__main_url}/{endpoint}"
+        response = requests.get(url=full_url, params=params, headers={
             "Accept": "application/json",
             "Accept-Encoding": "identity",
             "X-API-KEY": token,
         }, timeout=15)
 
-    def movie_random(self, token: str = None) -> requests.Response:
-        return self.__get(url="random", token=token)
+        return ResponseKp(response, endpoint)
 
-    def check_response_code(self, response: requests.Response, expected_code: int):
-        if response.status_code != expected_code:
-            pytest.fail(
-                f'Response "{response.url}" status code({response.status_code}) != expected_code({expected_code})')
+    def movie_random(self, invalid_token: bool = False) -> ResponseKp:
+        return self.__get(endpoint=self.__endpoints.get('random'), invalid_token=invalid_token)
 
-    def check_response_body(self, response: requests.Response, schema_name: str, nested_keys: list = None):
-        self.check_response_code(response, expected_code=200)
-        if not self.__schema_checker.check_field_keys(schema_name=schema_name, data=response.json(),
-                                                      nested_keys=nested_keys):
-            pytest.fail(f'Invalid response body "{response.url}"')
+    def health(self, invalid_token: bool = False):
+        return self.__get(endpoint=self.__endpoints.get('health'), invalid_token=invalid_token)
+
+    def check_response_code(self, response: ResponseKp, expected_code: int):
+        with allure.step(f'Проверка кода возврата "{expected_code}" на запрос "{response.response.request.method}" "{response.response.request.path_url}"'):
+            if response.response.status_code != expected_code:
+                pytest.fail(
+                    f'Response "{response.url}" status code({response.status_code}) != expected_code({expected_code})')
+
+    def check_response_body(self, response: ResponseKp, nested_keys: list = None):
+        with allure.step(f'Проверка тела ответа на запрос "{response.response.request.method}" "{response.response.request.path_url}"'):
+            self.check_response_code(response, expected_code=200)
+            if not self.__schema_checker.check_field_keys(schema_name=response.endpoint, data=response.json(),
+                                                          nested_keys=nested_keys):
+                pytest.fail(f'Invalid response body "{response.url}"')

@@ -26,7 +26,11 @@ class SchemaChecker:
     def __get_nested_data(self, data: dict, nested_keys: list) -> dict:
         nested_keys_tmp = [value for value in nested_keys]
         while len(nested_keys_tmp) != 0:
-            data = data.get(nested_keys_tmp.pop(0))
+            key = nested_keys_tmp.pop(0)
+            if key not in data.keys():
+                raise ValueError(f'Data has no such key "{key}"')
+
+            data = data.get(key)
 
         return data
 
@@ -38,7 +42,7 @@ class SchemaChecker:
         actual_fields = data.keys() if nested_keys is None else self.__get_nested_data(data, nested_keys).keys()
         success = expected_fields <= actual_fields
         if not success:
-            print(f'Absent fields of "{schema_name}" : "{actual_fields ^ expected_fields}"', file=sys.stderr)
+            print(f'Absent fields of "{schema_name}" : "{expected_fields ^ actual_fields}"', file=sys.stderr)
 
         return success
 
@@ -52,216 +56,9 @@ class SchemaChecker:
 
 
 # sc = SchemaChecker("F:/Python/diploma_project/response_schemas", "v1")
-# data = {
-#   "id": 666,
-#   "externalId": {
-#     "kpHD": "48e8d0acb0f62d8585101798eaeceec5",
-#     "imdb": "tt0232500",
-#     "tmdb": 9799
-#   },
-#   "name": "Человек паук",
-#   "alternativeName": "Spider man",
-#   "enName": "Spider man",
-#   "names": [
-#     {
-#       "name": "string",
-#       "language": "string",
-#       "type": "string"
-#     }
-#   ],
-#   "type": "movie",
-#   "typeNumber": 1,
-#   "year": 2023,
-#   "description": "string",
-#   "shortDescription": "string",
-#   "slogan": "string",
-#   "status": "completed",
-#   "rating": {
-#     "kp": 6.2,
-#     "imdb": 8.4,
-#     "tmdb": 3.2,
-#     "filmCritics": 10,
-#     "russianFilmCritics": 5.1,
-#     "await": 6.1
-#   },
-#   "votes": {
-#     "kp": "60000",
-#     "imdb": "50000",
-#     "tmdb": 10000,
-#     "filmCritics": 10000,
-#     "russianFilmCritics": 4000,
-#     "await": 34000
-#   },
-#   "movieLength": 120,
-#   "ratingMpaa": "pg13",
-#   "ageRating": 16,
-#   "logo": {
-#     "url": "string"
-#   },
-#   "poster": {
-#     "url": "string",
-#     "previewUrl": "string"
-#   },
-#   "backdrop": {
-#     "url": "string",
-#     "previewUrl": "string"
-#   },
-#   "videos": {
-#     "trailers": [
-#       {
-#         "url": "https://www.youtube.com/embed/ZsJz2TJAPjw",
-#         "name": "Official Trailer",
-#         "site": "youtube",
-#         "type": "TRAILER",
-#         "size": 0
-#       }
-#     ],
-#     "teasers": [
-#       {
-#         "url": "https://www.youtube.com/embed/ZsJz2TJAPjw",
-#         "name": "Official Trailer",
-#         "site": "youtube",
-#         "type": "TRAILER",
-#         "size": 0
-#       }
-#     ]
-#   },
-#   "genres": [
-#     {
-#       "name": "string"
-#     }
-#   ],
-#   "countries": [
-#     {
-#       "name": "string"
-#     }
-#   ],
-#   "persons": [
-#     {
-#       "id": 6317,
-#       "photo": "https://st.kp.yandex.net/images/actor_iphone/iphone360_6317.jpg",
-#       "name": "Пол Уокер",
-#       "enName": "Paul Walker",
-#       "description": "string",
-#       "profession": "string",
-#       "enProfession": "string"
-#     }
-#   ],
-#   "reviewInfo": {
-#     "count": 0,
-#     "positiveCount": 0,
-#     "percentage": "string"
-#   },
-#   "seasonsInfo": [
-#     {
-#       "number": 0,
-#       "episodesCount": 0
-#     }
-#   ],
-#   "budget": {
-#     "value": 207283,
-#     "currency": "€"
-#   },
-#   "fees": {
-#     "world": {
-#       "value": 207283,
-#       "currency": "€"
-#     },
-#     "russia": {
-#       "value": 207283,
-#       "currency": "€"
-#     },
-#     "usa": {
-#       "value": 207283,
-#       "currency": "€"
-#     }
-#   },
-#   "premiere": {
-#     "country": "США",
-#     "world": "2023-02-25T02:44:39.359Z",
-#     "russia": "2023-02-25T02:44:39.359Z",
-#     "digital": "string",
-#     "cinema": "2023-02-25T02:44:39.359Z",
-#     "bluray": "string",
-#     "dvd": "string"
-#   },
-#   "similarMovies": [
-#     {
-#       "id": 0,
-#       "name": "string",
-#       "enName": "string",
-#       "alternativeName": "string",
-#       "type": "string",
-#       "poster": {
-#         "url": "string",
-#         "previewUrl": "string"
-#       }
-#     }
-#   ],
-#   "sequelsAndPrequels": [
-#     {
-#       "id": 0,
-#       "name": "string",
-#       "enName": "string",
-#       "alternativeName": "string",
-#       "type": "string",
-#       "poster": {
-#         "url": "string",
-#         "previewUrl": "string"
-#       }
-#     }
-#   ],
-#   "watchability": {
-#     "items": [
-#       {
-#         "name": "string",
-#         "logo": {
-#           "url": "string"
-#         },
-#         "url": "string"
-#       }
-#     ]
-#   },
-#   "releaseYears": [
-#     {
-#       "start": 2022,
-#       "end": 2023
-#     }
-#   ],
-#   "top10": 1,
-#   "top250": 200,
-#   "ticketsOnSale": True,
-#   "totalSeriesLength": 155,
-#   "seriesLength": 20,
-#   "isSeries": True,
-#   "audience": [
-#     {
-#       "count": 1000,
-#       "country": "Россия"
-#     }
-#   ],
-#   "facts": [
-#     {
-#       "value": "string",
-#       "type": "string",
-#       "spoiler": True
-#     }
-#   ],
-#   "imagesInfo": {
-#     "postersCount": 0,
-#     "backdropsCount": 0,
-#     "framesCount": 0
-#   },
-#   "productionCompanies": [
-#     {
-#       "name": "string",
-#       "url": "string",
-#       "previewUrl": "string"
-#     }
-#   ]
-# }
+# data = {'videos': {'trailers': [], 'teasers': []}, 'status': None, 'externalId': {'kpHD': None, 'imdb': 'tt3389706', 'tmdb': 241861}, 'rating': {'kp': 6.3, 'imdb': 7.4, 'filmCritics': 0, 'russianFilmCritics': 0, 'await': None}, 'votes': {'kp': 153, 'imdb': 1713, 'filmCritics': 0, 'russianFilmCritics': 0, 'await': 0}, 'backdrop': {'url': None, 'previewUrl': None}, 'movieLength': 11, 'images': {'framesCount': 0}, 'productionCompanies': [{'name': 'Triune Films', 'url': None, 'previewUrl': None}], 'spokenLanguages': [{'name': 'English', 'nameEn': 'English'}], 'id': 814823, 'type': 'movie', 'name': 'Близость', 'description': 'Очнувшись, несколько мужчин обнаруживают, что к их ногам привязаны бомбы, которые срабатывают, если они отходят друг от друга на большое расстояние. Им предстоит нелегкая игра на выживание…', 'distributors': {'distributor': None, 'distributorRelease': None}, 'premiere': {'world': '2013-12-05T00:00:00.000Z'}, 'slogan': None, 'year': 2013, 'poster': {'url': 'https://st.kp.yandex.net/images/film_big/814823.jpg', 'previewUrl': 'https://st.kp.yandex.net/images/film_iphone/iphone360_814823.jpg'}, 'facts': None, 'genres': [{'name': 'короткометражка'}, {'name': 'фантастика'}, {'name': 'боевик'}, {'name': 'триллер'}], 'countries': [{'name': 'США'}], 'seasonsInfo': [], 'persons': [{'id': 2681405, 'photo': 'https://st.kp.yandex.net/images/actor_iphone/iphone360_2681405.jpg', 'name': 'Тодд Бруно', 'enName': 'Todd Bruno', 'description': 'Jake', 'profession': 'актеры', 'enProfession': 'actor'}, {'id': 2681422, 'photo': 'https://st.kp.yandex.net/images/actor_iphone/iphone360_2681422.jpg', 'name': 'Джош Коннолли', 'enName': 'Josh Connolly', 'description': 'Luke', 'profession': 'актеры', 'enProfession': 'actor'}, {'id': 3220483, 'photo': 'https://st.kp.yandex.net/images/actor_iphone/iphone360_3220483.jpg', 'name': 'Джастин Робинсон', 'enName': 'Justin Robinson', 'description': 'Boss Hunter', 'profession': 'актеры', 'enProfession': 'actor'}, {'id': 2916903, 'photo': 'https://st.kp.yandex.net/images/actor_iphone/iphone360_2916903.jpg', 'name': 'Тимоти Коннолли ст.', 'enName': 'Timothy Connolly Sr.', 'description': None, 'profession': 'актеры', 'enProfession': 'actor'}, {'id': 1899667, 'photo': 'https://st.kp.yandex.net/images/actor_iphone/iphone360_1899667.jpg', 'name': 'Дэниэл Джеймс', 'enName': 'Daniel James', 'description': None, 'profession': 'актеры', 'enProfession': 'actor'}, {'id': 2681429, 'photo': 'https://st.kp.yandex.net/images/actor_iphone/iphone360_2681429.jpg', 'name': 'Тим Аллен', 'enName': 'Tim Allen', 'description': None, 'profession': 'актеры', 'enProfession': 'actor'}, {'id': 2561189, 'photo': 'https://st.kp.yandex.net/images/actor_iphone/iphone360_2561189.jpg', 'name': 'Тим Коннолли мл.', 'enName': 'Tim Connolly Jr.', 'description': None, 'profession': 'актеры', 'enProfession': 'actor'}, {'id': 2681427, 'photo': 'https://st.kp.yandex.net/images/actor_iphone/iphone360_2681427.jpg', 'name': None, 'enName': 'Arris Quinones', 'description': None, 'profession': 'актеры', 'enProfession': 'actor'}, {'id': 1899667, 'photo': 'https://st.kp.yandex.net/images/actor_iphone/iphone360_1899667.jpg', 'name': 'Дэниэл Джеймс', 'enName': 'Daniel James', 'description': None, 'profession': 'композиторы', 'enProfession': 'composer'}, {'id': 3465453, 'photo': 'https://st.kp.yandex.net/images/actor_iphone/iphone360_3465453.jpg', 'name': 'Эмбер Киньонес', 'enName': 'Amber Quinones', 'description': None, 'profession': 'художники', 'enProfession': 'designer'}, {'id': 2561188, 'photo': 'https://st.kp.yandex.net/images/actor_iphone/iphone360_2561188.jpg', 'name': 'Райан Коннолли', 'enName': 'Ryan Connolly', 'description': None, 'profession': 'режиссеры', 'enProfession': 'director'}, {'id': 2561188, 'photo': 'https://st.kp.yandex.net/images/actor_iphone/iphone360_2561188.jpg', 'name': 'Райан Коннолли', 'enName': 'Ryan Connolly', 'description': None, 'profession': 'монтажеры', 'enProfession': 'editor'}, {'id': 2561188, 'photo': 'https://st.kp.yandex.net/images/actor_iphone/iphone360_2561188.jpg', 'name': 'Райан Коннолли', 'enName': 'Ryan Connolly', 'description': None, 'profession': 'операторы', 'enProfession': 'operator'}, {'id': 2681405, 'photo': 'https://st.kp.yandex.net/images/actor_iphone/iphone360_2681405.jpg', 'name': 'Тодд Бруно', 'enName': 'Todd Bruno', 'description': None, 'profession': 'продюсеры', 'enProfession': 'producer'}, {'id': 2561189, 'photo': 'https://st.kp.yandex.net/images/actor_iphone/iphone360_2561189.jpg', 'name': 'Тим Коннолли мл.', 'enName': 'Tim Connolly Jr.', 'description': None, 'profession': 'продюсеры', 'enProfession': 'producer'}, {'id': 2561188, 'photo': 'https://st.kp.yandex.net/images/actor_iphone/iphone360_2561188.jpg', 'name': 'Райан Коннолли', 'enName': 'Ryan Connolly', 'description': None, 'profession': 'продюсеры', 'enProfession': 'producer'}, {'id': 2561188, 'photo': 'https://st.kp.yandex.net/images/actor_iphone/iphone360_2561188.jpg', 'name': 'Райан Коннолли', 'enName': 'Ryan Connolly', 'description': None, 'profession': 'редакторы', 'enProfession': 'writer'}, {'id': 2544219, 'photo': 'https://st.kp.yandex.net/images/actor_iphone/iphone360_2544219.jpg', 'name': 'Сет Уорли', 'enName': 'Seth Worley', 'description': None, 'profession': 'редакторы', 'enProfession': 'writer'}], 'lists': [], 'typeNumber': 1, 'alternativeName': 'Proximity', 'enName': None, 'names': [{'name': 'Близость'}, {'name': 'Proximity'}], 'ageRating': None, 'budget': {}, 'ratingMpaa': None, 'updateDates': [], 'fees': {'world': {}, 'russia': {}, 'usa': {}}, 'updatedAt': '2023-07-03T18:07:07.569Z', 'shortDescription': None, 'technology': {'hasImax': False, 'has3D': False}, 'ticketsOnSale': False, 'sequelsAndPrequels': [], 'similarMovies': [], 'logo': {'url': None}, 'watchability': {'items': []}, 'top10': None, 'top250': None, 'deletedAt': None, 'isSeries': False, 'seriesLength': None, 'totalSeriesLength': None}
 #
-# res = sc.check_field_keys("movie", data, ["imagesInfo"])
+# res = sc.check_field_keys("movie/random", data)
 # print(res)
-# res = sc.check_field_keys("movie", data)
+# res = sc.check_field_keys("movie/random", data, ["externalId"])
 # print(res)

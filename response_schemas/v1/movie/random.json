@@ -163,12 +163,6 @@
       }
     ]
   },
-  "releaseYears": [
-    {
-      "start": 2022,
-      "end": 2023
-    }
-  ],
   "top10": 1,
   "top250": 200,
   "ticketsOnSale": true,
@@ -182,11 +176,6 @@
       "spoiler": true
     }
   ],
-  "imagesInfo": {
-    "postersCount": 0,
-    "backdropsCount": 0,
-    "framesCount": 0
-  },
   "productionCompanies": [
     {
       "name": "string",
