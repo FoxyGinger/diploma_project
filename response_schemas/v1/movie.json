@@ -93,11 +93,6 @@
       "enProfession": "string"
     }
   ],
-  "reviewInfo": {
-    "count": 0,
-    "positiveCount": 0,
-    "percentage": "string"
-  },
   "seasonsInfo": [
     {
       "number": 0,
@@ -180,12 +175,6 @@
   "totalSeriesLength": 155,
   "seriesLength": 20,
   "isSeries": true,
-  "audience": [
-    {
-      "count": 1000,
-      "country": "Россия"
-    }
-  ],
   "facts": [
     {
       "value": "string",
