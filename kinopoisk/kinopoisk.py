@@ -86,6 +86,14 @@ class Kinopoisk:
 
         return ResponseKp(response=resp, endpoint=endpoint)
 
+    def movie_by_id(self, movie_id: int, token: str = None) -> ResponseKp:
+        endpoint = 'movie_id'
+        parameters = {"id": movie_id}
+
+        resp = self.__get(path=self.__get_path_by_endpoint(endpoint), params=parameters, token=token)
+
+        return ResponseKp(response=resp, endpoint=endpoint)
+
     def check_response_code(self, response: ResponseKp, expected_code: int):
         with allure.step(f'Проверка кода возврата "{expected_code}" на запрос "{response.response.request.method}" "{response.response.request.path_url}"'):
             if response.response.status_code != expected_code:
