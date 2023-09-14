@@ -13,9 +13,11 @@ class ResponseKp:
         self.response = response
         self.endpoint = endpoint
 
+    @property
     def status_code(self) -> int:
-        return self.status_code()
+        return self.response.status_code
 
+    @property
     def url(self) -> str:
         return self.response.url
 
@@ -38,9 +40,8 @@ class Kinopoisk:
         self.__endpoints = config.get("endpoints")
         self.__schema_checker = SchemaChecker(config.get("response_schemas_folder"), api_version)
 
-    def __get(self, endpoint: str, params: dict = None, invalid_token: bool = False) -> ResponseKp:
-        token = self.__token if not invalid_token else "12345678987654321"
-
+    def __get(self, endpoint: str, params: dict = None, token: str = None) -> ResponseKp:
+        token = self.__token if token is None else token
         full_url = f"{self.__main_url}/{endpoint}"
         response = requests.get(url=full_url, params=params, headers={
             "Accept": "application/json",
@@ -50,11 +51,11 @@ class Kinopoisk:
 
         return ResponseKp(response, endpoint)
 
-    def movie_random(self, invalid_token: bool = False) -> ResponseKp:
-        return self.__get(endpoint=self.__endpoints.get('random'), invalid_token=invalid_token)
+    def movie_random(self, token: str = None) -> ResponseKp:
+        return self.__get(endpoint=self.__endpoints.get('random'), token=token)
 
-    def health(self, invalid_token: bool = False):
-        return self.__get(endpoint=self.__endpoints.get('health'), invalid_token=invalid_token)
+    def health(self, token: str = None):
+        return self.__get(endpoint=self.__endpoints.get('health'), token=token)
 
     def check_response_code(self, response: ResponseKp, expected_code: int):
         with allure.step(f'Проверка кода возврата "{expected_code}" на запрос "{response.response.request.method}" "{response.response.request.path_url}"'):
