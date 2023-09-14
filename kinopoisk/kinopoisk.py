@@ -70,6 +70,22 @@ class Kinopoisk:
 
         return ResponseKp(response=resp, endpoint=endpoint)
 
+    def movie_awards(self, token: str = None, params: dict = None) -> ResponseKp:
+        endpoint = 'movie_awards'
+        resp = self.__get(path=self.__get_path_by_endpoint(endpoint), token=token, params=params)
+
+        return ResponseKp(response=resp, endpoint=endpoint)
+
+    def movie_search(self, text: str, token: str = None, params: dict = None) -> ResponseKp:
+        endpoint = 'movie_search'
+        parameters = {"query": text}
+        if params is not None:
+            parameters.update(params)
+
+        resp = self.__get(path=self.__get_path_by_endpoint(endpoint), params=parameters, token=token)
+
+        return ResponseKp(response=resp, endpoint=endpoint)
+
     def check_response_code(self, response: ResponseKp, expected_code: int):
         with allure.step(f'Проверка кода возврата "{expected_code}" на запрос "{response.response.request.method}" "{response.response.request.path_url}"'):
             if response.response.status_code != expected_code:
