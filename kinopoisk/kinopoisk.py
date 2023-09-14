@@ -63,9 +63,11 @@ class Kinopoisk:
                 pytest.fail(
                     f'Response "{response.url}" status code({response.status_code}) != expected_code({expected_code})')
 
-    def check_response_body(self, response: ResponseKp, nested_keys: list = None):
+    def check_response_body(self, response: ResponseKp, expected_body: dict = None):
         with allure.step(f'Проверка тела ответа на запрос "{response.response.request.method}" "{response.response.request.path_url}"'):
             self.check_response_code(response, expected_code=200)
-            if not self.__schema_checker.check_field_keys(schema_name=response.endpoint, data=response.json(),
-                                                          nested_keys=nested_keys):
+            if expected_body is None:
+                expected_body = response.endpoint
+
+            if not self.__schema_checker.check_field_keys(actual_data=response.json(), expected_data=expected_body):
                 pytest.fail(f'Invalid response body "{response.url}"')

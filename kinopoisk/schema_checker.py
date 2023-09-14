@@ -13,46 +13,32 @@ class SchemaChecker:
         if not os.path.exists(self.__schema_path):
             raise ValueError(f'Response schema path do not exist "{self.__schema_path}"')
 
-    def __get_schema_data(self, schema_name: str, nested_keys: list = None):
+    def __get_schema_data(self, schema_name: str):
         if schema_name not in self.__schemas.keys():
-            self.__get_schema(schema_name)
+            self.__load_schema(schema_name)
 
         data = self.__schemas.get(schema_name)
-        if nested_keys is not None:
-            data = self.__get_nested_data(data, nested_keys)
 
         return data
 
-    def __get_nested_data(self, data: dict, nested_keys: list) -> dict:
-        nested_keys_tmp = [value for value in nested_keys]
-        while len(nested_keys_tmp) != 0:
-            key = nested_keys_tmp.pop(0)
-            if key not in data.keys():
-                raise ValueError(f'Data has no such key "{key}"')
-
-            data = data.get(key)
-
-        return data
-
-    def check_field_keys(self, schema_name: str, data: dict, nested_keys: list = None) -> bool:
-        if schema_name not in self.__schemas.keys():
-            self.__get_schema(schema_name)
-
-        expected_fields = self.__get_schema_data(schema_name, nested_keys).keys()
-        actual_fields = data.keys() if nested_keys is None else self.__get_nested_data(data, nested_keys).keys()
-        success = expected_fields <= actual_fields
-        if not success:
-            print(f'Absent fields of "{schema_name}" : "{expected_fields ^ actual_fields}"', file=sys.stderr)
-
-        return success
-
-    def __get_schema(self, schema_name: str):
+    def __load_schema(self, schema_name: str):
         schema_file = f"{self.__schema_path}/{schema_name}.json"
         if not os.path.exists(self.__schema_path):
             raise ValueError(f'Schema path do not exist "{schema_file}"')
 
         with open(schema_file) as file:
             self.__schemas[schema_name] = json.load(file)
+
+    def check_field_keys(self, actual_data: dict, expected_data: [str | dict]) -> bool:
+        expected_fields = self.__get_schema_data(expected_data).keys() if isinstance(expected_data, str) else expected_data.keys()
+        actual_fields = actual_data.keys()
+        success = expected_fields <= actual_fields
+        if not success:
+            print(f'Absent fields: "{expected_fields ^ actual_fields}"', file=sys.stderr)
+
+        return success
+
+
 
 
 # sc = SchemaChecker("F:/Python/diploma_project/response_schemas", "v1")
