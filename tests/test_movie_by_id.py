@@ -1,3 +1,5 @@
+import random
+
 from kinopoisk.kinopoisk import *
 
 
@@ -9,7 +11,8 @@ from kinopoisk.kinopoisk import *
 @pytest.mark.Smoke
 @pytest.mark.Regression
 def test_movie_search(kinopoisk: Kinopoisk):
-    movie_id = 44023
+    # Генерируем рандомный id
+    movie_id = random.randrange(1, 973064)
     with allure.step("1. Отправка запроса"):
         resp = kinopoisk.movie_by_id(movie_id=movie_id)
     with allure.step("2. Проверка кода 200"):
