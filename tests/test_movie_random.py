@@ -14,7 +14,7 @@ def test_movie_random(kinopoisk: Kinopoisk):
     with allure.step("2. Проверка кода 200"):
         kinopoisk.check_response_code(resp, 200)
     with allure.step("3. Проверка тела ответа"):
-        kinopoisk.check_response_body(resp)
+        kinopoisk.check_response_body_keys(resp)
 
 
 @allure.id("1001")

@@ -7,13 +7,13 @@ class SchemaChecker:
     __schema_path: str
     __schemas: dict[str, dict]
 
-    def __init__(self, schema_folder, api_version):
-        self.__schema_path = f"{schema_folder}/{api_version}"
+    def __init__(self, schema_folder):
+        self.__schema_path = f"{schema_folder}"
         self.__schemas = {}
         if not os.path.exists(self.__schema_path):
             raise ValueError(f'Response schema path do not exist "{self.__schema_path}"')
 
-    def __get_schema_data(self, schema_name: str):
+    def get_schema_data(self, schema_name: str):
         if schema_name not in self.__schemas.keys():
             self.__load_schema(schema_name)
 
@@ -29,8 +29,8 @@ class SchemaChecker:
         with open(schema_file) as file:
             self.__schemas[schema_name] = json.load(file)
 
-    def check_field_keys(self, actual_data: dict, expected_data: [str | dict]) -> bool:
-        expected_fields = self.__get_schema_data(expected_data).keys() if isinstance(expected_data, str) else expected_data.keys()
+    def check_field_keys(self, actual_data: dict, expected_keys: [str | set]) -> bool:
+        expected_fields = self.get_schema_data(expected_keys).keys() if isinstance(expected_keys, str) else expected_keys
         actual_fields = actual_data.keys()
         success = expected_fields <= actual_fields
         if not success:

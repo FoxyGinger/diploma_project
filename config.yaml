@@ -1,12 +1,28 @@
 server: "https://api.kinopoisk.dev"
-version: "v1"
 token: "4F1NQKQ-NH2M1C2-JWKVHR0-XW9DF0J"
 response_schemas_folder: "response_schemas"
 endpoints:
-  health: "health"
-  random: "movie/random"
-  poss_val_by_field: "movie/possible-values-by-field"
-  movie: "movie"
+  health:
+    path: "health"
+    ver: "v1"
+  movie:
+    path: "movie"
+    ver: "v1.3"
+  movie_id:
+    path: "movie" # movie/{id}
+    ver: "v1.3"
+  movie_random:
+    path: "movie/random"
+    ver: "v1.3"
+  movie_search:
+    path: "movie/search"
+    ver: "v1.1"
+  movie_awards:
+    path: "movie/awards"
+    ver: "v1.2"
+  movie_possible_values_by_field:
+    path: "movie/possible-values-by-field"
+    ver: "v1"
   season: "season"
   review: "review"
   person: "person"
