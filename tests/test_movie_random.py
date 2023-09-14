@@ -23,7 +23,6 @@ def test_movie_random(kinopoisk: Kinopoisk):
 @allure.sub_suite("Movie")
 @allure.feature("Movie")
 @pytest.mark.Regression
-@pytest.mark.xfail(condition=lambda: True, reason='Тест может упасть так как запрос может вернуть 2 одинаковых фильма')
 def test_movie_random_2_movies(kinopoisk: Kinopoisk):
     with allure.step("1. Отправка запроса на первый рандомный фильм"):
         movie1_resp = kinopoisk.movie_random()
