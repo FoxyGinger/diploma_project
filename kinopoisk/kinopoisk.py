@@ -1,5 +1,4 @@
 import sys
-from enum import Enum
 
 import pytest
 import requests
@@ -58,12 +57,6 @@ class Kinopoisk:
 
         return ResponseKp(response=resp, endpoint=endpoint)
 
-    def health(self, token: str = None) -> ResponseKp:
-        endpoint = 'health'
-        resp = self.__get(path=self.__get_path_by_endpoint(endpoint), token=token)
-
-        return ResponseKp(response=resp, endpoint=endpoint)
-
     def movie_possible_values_by_field(self, field: str, token: str = None) -> ResponseKp:
         endpoint = 'movie_possible_values_by_field'
         resp = self.__get(path=self.__get_path_by_endpoint(endpoint), params={"field": field}, token=token)
@@ -88,9 +81,8 @@ class Kinopoisk:
 
     def movie_by_id(self, movie_id: int, token: str = None) -> ResponseKp:
         endpoint = 'movie_id'
-        parameters = {"id": movie_id}
 
-        resp = self.__get(path=self.__get_path_by_endpoint(endpoint), params=parameters, token=token)
+        resp = self.__get(path=self.__get_path_by_endpoint(endpoint).format(id=movie_id), token=token)
 
         return ResponseKp(response=resp, endpoint=endpoint)
 
