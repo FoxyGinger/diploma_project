@@ -1,0 +1,36 @@
+{
+	"mode": "testops",
+	"fallback": "report",
+	"report": {
+		"driver": "local",
+		"connection": {
+			"local": {
+				"path": "./qase-report",
+				"format": "json"
+			}
+		}
+	},
+	"testops": {
+		"bulk": true,
+		"api": {
+			"token": "ee55b14e315eca6b8ab8cd2775ceb236167e5523e6fdc4e9088411e68e2073ba",
+			"host": "qase.io"
+		},
+		"run": {
+            "id": 5,
+			"complete": false
+		},
+		"defect": true,
+		"project": "API",
+		"chunk": 200
+	},
+	"framework": {
+		"pytest": {
+			"capture": {
+				"logs": true,
+				"http": true
+			}
+		}
+	},
+	"environment": "local"
+}
