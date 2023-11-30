@@ -1,7 +1,6 @@
 import inspect
 
 import requests
-
 from qaseio.pytest import qase
 
 
@@ -28,32 +27,57 @@ class ResponseKp:
                 f'Код ответа на "{self.url}" {self.status_code}(фактический) != {expected_code}(ожидаемый)'
 
     def check_field_keys(self, expected_fields: set, nested_fields: list = None, subset: bool = True):
-        with qase.step(f'Проверить поля ответа: {expected_fields}', expected='Поля содержаться'):
-            actual_fields = self.json().keys() if nested_fields is None else self.__get_nested_object(
-                nested_fields).keys()
+        def check(obj, expected_fields: set, subset: bool):
+            actual_fields = obj.keys()
             success = expected_fields <= actual_fields if subset else expected_fields == actual_fields
-            assert success, f'Отсутствуют поля: "{expected_fields ^ actual_fields}"'
+            if subset:
+                assert success, f'Отсутствуют поля: "{expected_fields ^ actual_fields}"'
+            else:
+                assert success, f'Лишние поля: "{expected_fields ^ actual_fields}"'
+
+        with qase.step(f'Проверить поля ответа: {expected_fields}', expected='Поля содержаться'):
+            obj = self.json() if nested_fields is None else self.__get_nested_object(nested_fields)
+            if not isinstance(obj, list):
+                check(obj, expected_fields, subset)
+                return
+
+            for o in obj:
+                check(o, expected_fields, subset)
 
     def check_field_values(self, expected_field_values: dict, nested_fields: list = None):
+        def check(obj, expected_field_values: dict):
+            for field_key, field_value in expected_field_values.items():
+                assert field_key in obj.keys(), f'Отсутствует поле "{field_key}"'
+
+                assert obj.get(field_key) == field_value, \
+                    f'Поле "{field_key}": {obj.get(field_key)}(фактический) != {field_value}(ожидаемый)'
+
         with qase.step(f'Проверить значения полей ответа: {expected_field_values}',
                        expected='Значения полей ожидаемые'):
-            actual_fields_values = self.json() if nested_fields is None else self.__get_nested_object(nested_fields)
-            for field_key, field_value in expected_field_values.items():
-                assert field_key in actual_fields_values.keys(), \
-                    f'Отсутствует поле: "{field_key}"'
+            obj = self.json() if nested_fields is None else self.__get_nested_object(nested_fields)
+            if not isinstance(obj, list):
+                check(obj, expected_field_values)
+                return
 
-                assert actual_fields_values.get(field_key) == field_value, \
-                    f'Поле "{field_key}": {actual_fields_values.get(field_key)}(фактический) != {field_value}(ожидаемый)'
+            for o in obj:
+                check(o, expected_field_values)
 
     def check_object_count(self, field_name: str, expected_count: int, nested_fields: list = None):
-        with qase.step(f'Проверить количество элементов в ответе в поле "{field_name}', expected=f'{expected_count}'):
-            actual_fields_values = self.json() if nested_fields is None else self.__get_nested_object(nested_fields)
-            assert field_name in actual_fields_values.keys(), \
-                f'Отсутствует поле: "{field_name}"'
+        def check(obj, field_name: str, expected_count: int):
+            assert field_name in obj.keys(), f'Отсутствует поле "{field_name}"'
 
-            actual_count = len(actual_fields_values.get(field_name))
+            actual_count = len(obj.get(field_name))
             assert actual_count == expected_count, \
                 f'кол-во элементов в поле "{field_name}": {actual_count}(фактическое) != {expected_count}(ожидаемое)'
+
+        with qase.step(f'Проверить количество элементов в ответе в поле "{field_name}', expected=f'{expected_count}'):
+            obj = self.json() if nested_fields is None else self.__get_nested_object(nested_fields)
+            if not isinstance(obj, list):
+                check(obj, field_name, expected_count)
+                return
+
+            for o in obj:
+                check(o, field_name, expected_count)
 
     def __get_nested_object(self, nested_fields: list):
         nested_object = self.json()
@@ -102,7 +126,7 @@ class Kinopoisk:
             with qase.step('Выставить таймаут для запроса', expected=f'ожидание ответа не более {timeout} секунд'):
                 pass
         else:
-            token = self.__token
+            timeout = self.__request_timeout
 
         full_url = f"{self.__main_url}/{path}"
         with qase.step(f'Отправить GET запрос: "{full_url}"', expected="Запрос отправлен"):
