@@ -1,6 +1,6 @@
 server: "https://api.kinopoisk.dev"
 token: "4F1NQKQ-NH2M1C2-JWKVHR0-XW9DF0J"
-response_schemas_folder: "response_schemas"
+request_timeout: 45
 endpoints:
   movie:
     path: "movie"

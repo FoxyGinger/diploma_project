@@ -19,8 +19,8 @@ invalid_token = "invalid_token"
     ("layer", "api"),
     ("automation", "automated")
 )
-def test_movie_by_id(kinopoisk: Kinopoisk):
-    resp = kinopoisk.movie_by_id(movie_id=movie_id)
+def test_movie_id(kinopoisk: Kinopoisk):
+    resp = kinopoisk.movie_id(movie_id=movie_id)
     resp.check_response_code(200)
     resp.check_field_values(expected_field_values={"id": movie_id})
 
@@ -36,8 +36,8 @@ def test_movie_by_id(kinopoisk: Kinopoisk):
     ("layer", "api"),
     ("automation", "automated")
 )
-def test_movie_by_invalid_id(kinopoisk: Kinopoisk):
-    resp = kinopoisk.movie_by_id(movie_id=invalid_movie_id)
+def test_movie_id_invalid_id(kinopoisk: Kinopoisk):
+    resp = kinopoisk.movie_id(movie_id=invalid_movie_id)
     resp.check_response_code(400)
 
 
@@ -52,7 +52,7 @@ def test_movie_by_invalid_id(kinopoisk: Kinopoisk):
     ("layer", "api"),
     ("automation", "automated")
 )
-def test_movie_by_invalid_token(kinopoisk: Kinopoisk):
-    resp = kinopoisk.movie_by_id(movie_id=movie_id, token=invalid_token)
+def test_movie_id_invalid_token(kinopoisk: Kinopoisk):
+    resp = kinopoisk.movie_id(movie_id=movie_id, token=invalid_token)
     resp.check_response_code(401)
 
