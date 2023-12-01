@@ -65,7 +65,7 @@ def test_movie_id_invalid_token(kinopoisk: Kinopoisk):
     ("layer", "api"),
     ("automation", "automated")
 )
-def test_movie_by_another_page(kinopoisk: Kinopoisk):
+def test_movie_id_another_page(kinopoisk: Kinopoisk):
     page1 = 2
     resp1 = kinopoisk.movie(query_params={
         "page": page1
@@ -93,7 +93,7 @@ def test_movie_by_another_page(kinopoisk: Kinopoisk):
     ("layer", "api"),
     ("automation", "automated")
 )
-def test_movie_by_another_page(kinopoisk: Kinopoisk):
+def test_movie_id_page_limit(kinopoisk: Kinopoisk):
     limit = 13
     resp = kinopoisk.movie(query_params={
         "limit": limit
