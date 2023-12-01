@@ -22,7 +22,7 @@ def test_movie(kinopoisk: Kinopoisk):
         resp.check_object_count(field_name='docs', expected_count=10)
 
     with qase.step("Проверить уникальность id фильмов", expected="Уникальны"):
-        movies = resp.json().get('docs')
+        movies = resp.get_movies()
         ids = set([movie['id'] for movie in movies])
         assert len(ids) == len(movies), f'В ответе есть повторящиеся id'
 
@@ -81,7 +81,7 @@ def test_movie_sort_year_asc(kinopoisk: Kinopoisk):
         "sortType": 1,
         "notNullFields": "year"})
     resp.check_response_code(200)
-    movies = resp.json().get("docs")
+    movies = resp.get_movies()
     year = movies[0].get('year')
     with qase.step('Проверить сортировку по возрастанию по полю "year"', expected="year идут по возрастанию"):
         with qase.step("Проверить, что года ненулевые", expected="Года ненулевые"):
@@ -111,7 +111,7 @@ def test_movie_sort_year_desc(kinopoisk: Kinopoisk):
         "sortType": -1,
         "notNullFields": "year"})
     resp.check_response_code(200)
-    movies = resp.json().get("docs")
+    movies = resp.get_movies()
     year = movies[0].get('year')
     with qase.step('Проверить сортировку по убыванию по полю "year"', expected="year идут по убыванию"):
         with qase.step("Проверить, что года ненулевые", expected="Года ненулевые"):
@@ -141,7 +141,7 @@ def test_movie_sort_rating_kp_asc(kinopoisk: Kinopoisk):
         "sortType": 1,
         "notNullFields": "top10"})
     resp.check_response_code(200)
-    movies = resp.json().get("docs")
+    movies = resp.get_movies()
     rating_kp = movies[0].get('rating').get('kp')
     with qase.step('Проверить сортировку по возрастанию по полю "rating.kp"', expected="rating.kp идут по возрастанию"):
         for movie in movies[1:]:
@@ -167,7 +167,7 @@ def test_movie_sort_rating_kp_desc(kinopoisk: Kinopoisk):
         "sortType": -1,
         "notNullFields": "top10"})
     resp.check_response_code(200)
-    movies = resp.json().get("docs")
+    movies = resp.get_movies()
     rating_kp = movies[0].get('rating').get('kp')
     with qase.step('Проверить сортировку по убыванию по полю "rating.kp"', expected="rating.kp идут по возрастанию"):
         for movie in movies[1:]:
@@ -191,7 +191,7 @@ def test_movie_valid_first_year(kinopoisk: Kinopoisk):
     resp = kinopoisk.movie(query_params={
         "year": first_year})
     resp.check_response_code(200)
-    movies = resp.json().get("docs")
+    movies = resp.get_movies()
     with qase.step(f'Проверить, что год в фильмах равен {first_year}', expected=f"Все фильмы {first_year} года"):
         for movie in movies:
             year = movie.get('year')
@@ -213,7 +213,7 @@ def test_movie_valid_last_year(kinopoisk: Kinopoisk):
     resp = kinopoisk.movie(query_params={
         "year": last_year})
     resp.check_response_code(200)
-    movies = resp.json().get("docs")
+    movies = resp.get_movies()
     with qase.step(f'Проверить, что год в фильмах равен {last_year}', expected=f"Все фильмы {last_year} года"):
         for movie in movies:
             year = movie.get('year')
@@ -236,7 +236,7 @@ def test_movie_valid_first_year_1(kinopoisk: Kinopoisk):
     resp = kinopoisk.movie(query_params={
         "year": valid_year})
     resp.check_response_code(200)
-    movies = resp.json().get("docs")
+    movies = resp.get_movies()
     with qase.step(f'Проверить, что год в фильмах равен {valid_year}', expected=f"Все фильмы {valid_year} года"):
         for movie in movies:
             year = movie.get('year')
@@ -259,7 +259,7 @@ def test_movie_valid_last_year_1(kinopoisk: Kinopoisk):
     resp = kinopoisk.movie(query_params={
         "year": valid_year})
     resp.check_response_code(200)
-    movies = resp.json().get("docs")
+    movies = resp.get_movies()
     with qase.step(f'Проверить, что год в фильмах равен {valid_year}', expected=f"Все фильмы {valid_year} года"):
         for movie in movies:
             year = movie.get('year')
@@ -319,7 +319,7 @@ def test_movie_by_genre(kinopoisk: Kinopoisk):
         "genre.name": genre})
     resp.check_response_code(200)
     with qase.step(f'Проверить, что фильмы принадлежат жанру "{genre}"', expected=f'Все фильмы жанра "{genre}"'):
-        movies = resp.json()['docs']
+        movies = resp.get_movies()
         for movie in movies:
             success = False
             for current_genre in movie.get('genres'):
@@ -349,7 +349,7 @@ def test_movie_by_two_genres(kinopoisk: Kinopoisk):
     resp.check_response_code(200)
     with qase.step(f'Проверить, что фильмы принадлежат жанру "{genre1}" и "{genre2}"',
                    expected=f'Все фильмы жанра "{genre1}" и "{genre2}"'):
-        movies = resp.json()['docs']
+        movies = resp.get_movies()
         for movie in movies:
             success1 = False
             success2 = False
@@ -384,7 +384,7 @@ def test_movie_by_two_genres_ex(kinopoisk: Kinopoisk):
     resp.check_response_code(200)
     with qase.step(f'Проверить, что фильмы принадлежат жанру "{genre1}" и не "{genre2}"',
                    expected=f'Все фильмы жанра "{genre1}" и не "{genre2}"'):
-        movies = resp.json()['docs']
+        movies = resp.get_movies()
         for movie in movies:
             success1 = False
             success2 = True
@@ -416,7 +416,7 @@ def test_movie_rating_kp_0_10(kinopoisk: Kinopoisk):
         "rating.kp": f'{rating_1}-{rating_2}'
     })
     resp.check_response_code(200)
-    movies = resp.json().get("docs")
+    movies = resp.get_movies()
     with qase.step(f'Проверить рейтинг "rating.kp" в дипозоне от {rating_1} до {rating_2}',
                    expected=f"rating.kp от {rating_1} до {rating_2}"):
         for movie in movies:
@@ -442,7 +442,7 @@ def test_movie_rating_kp_1_5(kinopoisk: Kinopoisk):
         "rating.kp": f'{rating_1}-{rating_2}'
     })
     resp.check_response_code(200)
-    movies = resp.json().get("docs")
+    movies = resp.get_movies()
     with qase.step(f'Проверить рейтинг "rating.kp" в дипозоне от {rating_1} до {rating_2}',
                    expected=f"rating.kp от {rating_1} до {rating_2}"):
         for movie in movies:
@@ -468,7 +468,7 @@ def test_movie_rating_kp_9_10(kinopoisk: Kinopoisk):
         "rating.kp": f'{rating_1}-{rating_2}'
     })
     resp.check_response_code(200)
-    movies = resp.json().get("docs")
+    movies = resp.get_movies()
     with qase.step(f'Проверить рейтинг "rating.kp" в дипозоне от {rating_1} до {rating_2}',
                    expected=f"rating.kp от {rating_1} до {rating_2}"):
         for movie in movies:
@@ -493,7 +493,7 @@ def test_movie_rating_kp_10(kinopoisk: Kinopoisk):
         "rating.kp": rating
     })
     resp.check_response_code(200)
-    movies = resp.json().get("docs")
+    movies = resp.get_movies()
     with qase.step(f'Проверить рейтинг "rating.kp" равен {rating}', expected=f"rating.kp равен {rating}"):
         for movie in movies:
             movie_rating_kp = movie.get('rating').get('kp')
@@ -557,7 +557,7 @@ def test_movie_by_type(kinopoisk: Kinopoisk):
         "type": movie_type
     })
     resp.check_response_code(200)
-    movies = resp.json().get("docs")
+    movies = resp.get_movies()
     with qase.step(f'Проверить тип "type" равен {movie_type}', expected=f"type равен {movie_type}"):
         for movie in movies:
             current_movie_type = movie.get('type')
@@ -600,3 +600,32 @@ def test_movie_by_invalid_type(kinopoisk: Kinopoisk):
         "type": movie_type
     })
     resp.check_response_code(400)
+
+
+@qase.id(326)
+@qase.title("Получение фильмов по стране")
+@qase.suite("Поиск фильма с фильтрами (фильмы, сериалы)")
+@qase.fields(
+    ("severity", "major"),
+    ("priority", "high"),
+    ("behavior", "positive"),
+    ("type", "smoke"),
+    ("layer", "api"),
+    ("automation", "automated")
+)
+def test_movie_by_country(kinopoisk: Kinopoisk):
+    country_name = "Россия"
+    resp = kinopoisk.movie(query_params={
+        "countries.name": country_name
+    })
+    resp.check_response_code(200)
+    with qase.step(f'Проверить, что фильмы относятся к стране "{country_name}"', expected=f'Все фильмы страны "{country_name}"'):
+        movies = resp.get_movies()
+        for movie in movies:
+            success = False
+            for current_country_name in movie.get('countries'):
+                if current_country_name.get('name') == country_name:
+                    success = True
+                    break
+
+        assert success, f'есть фильмы не страны "{country_name}"'

@@ -26,6 +26,12 @@ class ResponseKp:
             assert self.status_code == expected_code, \
                 f'Код ответа на "{self.url}" {self.status_code}(фактический) != {expected_code}(ожидаемый)'
 
+    def get_movies(self) -> list:
+        if "docs" in self.json().keys():
+            return self.json().get("docs")
+
+        return [self.json()]
+
     def check_field_keys(self, expected_fields: set, nested_fields: list = None, subset: bool = True):
         def check(obj, expected_fields: set, subset: bool):
             actual_fields = obj.keys()

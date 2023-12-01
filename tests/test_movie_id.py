@@ -71,13 +71,13 @@ def test_movie_id_another_page(kinopoisk: Kinopoisk):
         "page": page1
     })
     resp1.check_response_code(200)
-    movies1 = resp1.json().get("docs")
+    movies1 = resp1.get_movies()
     page2 = 3
     resp2 = kinopoisk.movie(query_params={
         "page": page2
     })
     resp2.check_response_code(200)
-    movies2 = resp2.json().get("docs")
+    movies2 = resp2.get_movies()
     for movie in movies2:
         assert movie not in movies1, f"Есть пересечения фильмов с {page1} страницы с {page2} страницой"
 
@@ -100,6 +100,6 @@ def test_movie_id_page_limit(kinopoisk: Kinopoisk):
     })
     resp.check_response_code(200)
     resp.check_field_values(expected_field_values={"limit": limit})
-    movies = resp.json().get("docs")
+    movies = resp.get_movies()
     with qase.step("Проверить кол-во полученных элементов", expected=f"кол-во элементов равно {limit}"):
         assert len(movies) == limit, f"кол-во элементов не равно {len(movies)} != {limit}"
