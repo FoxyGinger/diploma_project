@@ -17,7 +17,7 @@ def config() -> dict:
         print(f'Warning! Config file "{config_file}" is not exists', file=sys.stderr)
 
     with open(config_file) as file:
-        config = yaml.load(file, Loader=yaml.loader.SafeLoader)
+        config = yaml.safe_load(file)
 
     if len(config) == 0:
         raise ValueError(f'Config is invalid! Check config file "{config_file}"')

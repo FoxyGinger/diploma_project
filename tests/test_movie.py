@@ -632,3 +632,75 @@ def test_movie_by_country(kinopoisk: Kinopoisk):
                     break
 
             assert success, f'есть фильмы не страны "{country_name}"'
+
+
+@qase.id(300)
+@qase.title("Получение фильмов по возрастному рейтингу")
+@qase.suite("Поиск фильма с фильтрами (фильмы, сериалы)")
+@qase.fields(
+    ("severity", "major"),
+    ("priority", "high"),
+    ("behavior", "positive"),
+    ("type", "smoke"),
+    ("layer", "api"),
+    ("automation", "automated")
+)
+def test_movie_by_age(kinopoisk: Kinopoisk):
+    age_rating = 6
+    resp = kinopoisk.movie(query_params={
+        "ageRating": age_rating
+    })
+    resp.check_response_code(200)
+    with qase.step(f'Проверить, что фильмы относятся к возрастному рейтингу "{age_rating}"',
+                   expected=f'Все фильмы с возрастным рейтингом не выше "{age_rating}"'):
+        movies = resp.get_movies()
+        for movie in movies:
+            current_age_rating = movie.get('ageRating')
+
+            assert current_age_rating <= age_rating, f'есть фильмы c возрастным рейтингом: {current_age_rating}'
+
+
+@qase.id(21)
+@qase.title("Получение фильмов по продолжительности фильма от 70 до 90 мин")
+@qase.suite("Поиск фильма с фильтрами (фильмы, сериалы)")
+@qase.fields(
+    ("severity", "major"),
+    ("priority", "high"),
+    ("behavior", "positive"),
+    ("type", "smoke"),
+    ("layer", "api"),
+    ("automation", "automated")
+)
+def test_movie_by_duration_70_90(kinopoisk: Kinopoisk):
+    duration_first = 70
+    duration_last = 90
+    resp = kinopoisk.movie(query_params={
+        "movieLength": f"{duration_first}-{duration_last}"
+    })
+    resp.check_response_code(200)
+    with qase.step(f'Проверить, что у фильмов продолжительность от {duration_first} до {duration_last} мин',
+                   expected=f'У всех фильмов продолжительность попадает в диапазон'):
+        movies = resp.get_movies()
+        for movie in movies:
+            current_duration = movie.get('movieLength')
+
+            assert duration_first <= current_duration <= duration_last, f'есть фильмы с продолжительностью: {current_duration}'
+
+
+@qase.id(331)
+@qase.title("Получение фильмов по продолжительности фильма -1")
+@qase.suite("Поиск фильма с фильтрами (фильмы, сериалы)")
+@qase.fields(
+    ("severity", "normal"),
+    ("priority", "medium"),
+    ("behavior", "negative"),
+    ("type", "regression"),
+    ("layer", "api"),
+    ("automation", "automated")
+)
+def test_movie_by_duration_negative(kinopoisk: Kinopoisk):
+    duration = -1
+    resp = kinopoisk.movie(query_params={
+        "movieLength": duration
+    })
+    resp.check_response_code(400)
