@@ -29,6 +29,9 @@ class ResponseKp:
     def get_movies(self) -> list:
         return self.__get_objects_by_type("movie")
 
+    def get_awards(self) -> list:
+        return self.__get_objects_by_type("awards")
+
     def __get_objects_by_type(self, object_type: str) -> list:
         assert object_type in self.response.url, f'запрос не относился к "{object_type}": {self.response.url}'
         try:
@@ -136,6 +139,24 @@ class Kinopoisk:
 
         return ResponseKp(response=resp)
 
+    def movie_search(self, text: str, token: str = None, query_params: dict = None, timeout: int = None) -> ResponseKp:
+        """
+        Метод вернет список фильмов которые подходят под ваш запрос.
+        :param text:
+        :param token:
+        :param query_params:
+        :param timeout:
+        :return:
+        """
+        parameters = {"query": text}
+        if query_params is not None:
+            parameters.update(query_params)
+
+        resp = self.__get(path=self.__get_path_by_caller_function(), query_params=parameters, token=token,
+                          timeout=timeout)
+
+        return ResponseKp(response=resp)
+
     def movie_possible_values_by_field(self, field: str, token: str = None, timeout: int = None) -> ResponseKp:
         """
         Этот метод принимает только определенные поля, и возвращает по ним все доступные значения.
@@ -158,24 +179,6 @@ class Kinopoisk:
         :return:
         """
         resp = self.__get(path=self.__get_path_by_caller_function(), token=token, query_params=query_params,
-                          timeout=timeout)
-
-        return ResponseKp(response=resp)
-
-    def movie_search(self, text: str, token: str = None, query_params: dict = None, timeout: int = None) -> ResponseKp:
-        """
-        Метод вернет список фильмов которые подходят под ваш запрос.
-        :param text:
-        :param token:
-        :param query_params:
-        :param timeout:
-        :return:
-        """
-        parameters = {"query": text}
-        if query_params is not None:
-            parameters.update(query_params)
-
-        resp = self.__get(path=self.__get_path_by_caller_function(), query_params=query_params, token=token,
                           timeout=timeout)
 
         return ResponseKp(response=resp)
