@@ -19,7 +19,7 @@ endpoints:
     ver: "v1.4"
   movie_possible_values_by_field:
     path: "movie/possible-values-by-field"
-    ver: "v1.4"
+    ver: "v1"
   season:
     path: "season"
     ver: "1.4"
