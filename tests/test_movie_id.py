@@ -1,9 +1,5 @@
 from kinopoisk.kinopoisk import *
 
-movie_id = 22222
-invalid_movie_id = "12845%$"
-invalid_token = "invalid_token"
-
 
 @qase.id(1)
 @qase.suite("Поиск фильма по id (фильмы, сериалы)")
@@ -17,9 +13,12 @@ invalid_token = "invalid_token"
     ("automation", "automated")
 )
 def test_movie_id(kinopoisk: Kinopoisk):
+    movie_id = 22222
     resp = kinopoisk.movie_id(movie_id=movie_id)
     resp.check_response_code(200)
-    resp.check_field_values(expected_field_values={"id": movie_id})
+    movie = resp.get_movies()[0]
+    with qase.step("Проверить, что id полученного фильма, совпадает с запрошенным", expected="id фильмов совпадают"):
+        assert movie.get('id') == movie_id, f"id фильмов не совпадают: {movie.get('id')}(actual) != {movie_id}(expected)"
 
 
 @qase.id(2)
@@ -34,6 +33,7 @@ def test_movie_id(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_id_invalid_id(kinopoisk: Kinopoisk):
+    invalid_movie_id = "12845%$"
     resp = kinopoisk.movie_id(movie_id=invalid_movie_id)
     resp.check_response_code(400)
 
@@ -50,6 +50,8 @@ def test_movie_id_invalid_id(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_id_invalid_token(kinopoisk: Kinopoisk):
+    movie_id = 22222
+    invalid_token = "invalid_token"
     resp = kinopoisk.movie_id(movie_id=movie_id, token=invalid_token)
     resp.check_response_code(401)
 
@@ -99,7 +101,8 @@ def test_movie_id_page_limit(kinopoisk: Kinopoisk):
         "limit": limit
     })
     resp.check_response_code(200)
-    resp.check_field_values(expected_field_values={"limit": limit})
+    with qase.step(f'Проверить, что параметр "limit", совпадает с запрошенным', expected='"limit" совпадают'):
+        assert resp.json().get('limit') == limit, f'"limit" не совпадают: {resp.json().get("limit")}(actual) != {limit}(expected)'
     movies = resp.get_movies()
     with qase.step("Проверить кол-во полученных элементов", expected=f"кол-во элементов равно {limit}"):
         assert len(movies) == limit, f"кол-во элементов не равно {len(movies)} != {limit}"

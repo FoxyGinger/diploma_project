@@ -329,7 +329,7 @@ def test_movie_by_genre(kinopoisk: Kinopoisk):
                     success = True
                     break
 
-        assert success, f'есть фильмы не жанра "{genre}"'
+            assert success, f'есть фильмы не жанра "{genre}"'
 
 
 @qase.id(316)
@@ -397,7 +397,7 @@ def test_movie_by_two_genres_ex(kinopoisk: Kinopoisk):
                     success2 = False
                     break
 
-        assert success1 and success2, f'есть фильмы не жанра "{genre1}" и "{genre2}"'
+            assert success1 and success2, f'есть фильмы не жанра "{genre1}" и "{genre2}"'
 
 
 @qase.id(318)
@@ -631,4 +631,4 @@ def test_movie_by_country(kinopoisk: Kinopoisk):
                     success = True
                     break
 
-        assert success, f'есть фильмы не страны "{country_name}"'
+            assert success, f'есть фильмы не страны "{country_name}"'
