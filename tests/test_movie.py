@@ -18,11 +18,11 @@ last_year = 2050
 def test_movie(kinopoisk: Kinopoisk):
     resp = kinopoisk.movie()
     resp.check_response_code(200)
+    movies = resp.get_movies()
     with qase.step("Проверить количество полученных фильмов", expected="Больше 0"):
-        resp.check_object_count(field_name='docs', expected_count=10)
+        assert len(movies) > 0, "Фильмов нет"
 
     with qase.step("Проверить уникальность id фильмов", expected="Уникальны"):
-        movies = resp.get_movies()
         ids = set([movie['id'] for movie in movies])
         assert len(ids) == len(movies), f'В ответе есть повторящиеся id'
 
@@ -42,9 +42,11 @@ def test_movie_selected_fields(kinopoisk: Kinopoisk):
     selected_fields = ['name', 'type', 'year', 'genres', 'countries', 'rating']
     resp = kinopoisk.movie(query_params={"selectFields": selected_fields})
     resp.check_response_code(200)
+    movies = resp.get_movies()
     with qase.step('Проверить, что фильмы содержат только нужные поля', expected="Содержат"):
-        # список фильмов содержиться в поле "docs"
-        resp.check_field_keys(set(selected_fields), nested_fields=['docs'], subset=False)
+        for movie in movies:
+            assert set(
+                selected_fields) == movie.keys(), f"Содержаться другие поля: {set(selected_fields) ^ movie.keys()}"
 
 
 @qase.id(304)
@@ -619,7 +621,8 @@ def test_movie_by_country(kinopoisk: Kinopoisk):
         "countries.name": country_name
     })
     resp.check_response_code(200)
-    with qase.step(f'Проверить, что фильмы относятся к стране "{country_name}"', expected=f'Все фильмы страны "{country_name}"'):
+    with qase.step(f'Проверить, что фильмы относятся к стране "{country_name}"',
+                   expected=f'Все фильмы страны "{country_name}"'):
         movies = resp.get_movies()
         for movie in movies:
             success = False

@@ -27,70 +27,18 @@ class ResponseKp:
                 f'Код ответа на "{self.url}" {self.status_code}(фактический) != {expected_code}(ожидаемый)'
 
     def get_movies(self) -> list:
-        if "docs" in self.json().keys():
-            return self.json().get("docs")
+        return self.__get_objects_by_type("movie")
 
-        return [self.json()]
+    def __get_objects_by_type(self, object_type: str) -> list:
+        assert object_type in self.response.url, f'запрос не относился к "{object_type}": {self.response.url}'
+        try:
+            assert len(self.json().keys()) > 0, f"Некорректное тело ответа: {self.json()}"
+            if "docs" in self.json().keys():
+                return self.json().get("docs")
 
-    def check_field_keys(self, expected_fields: set, nested_fields: list = None, subset: bool = True):
-        def check(obj, expected_fields: set, subset: bool):
-            actual_fields = obj.keys()
-            success = expected_fields <= actual_fields if subset else expected_fields == actual_fields
-            if subset:
-                assert success, f'Отсутствуют поля: "{expected_fields ^ actual_fields}"'
-            else:
-                assert success, f'Лишние поля: "{expected_fields ^ actual_fields}"'
-
-        with qase.step(f'Проверить поля ответа: {expected_fields}', expected='Поля содержаться'):
-            obj = self.json() if nested_fields is None else self.__get_nested_object(nested_fields)
-            if not isinstance(obj, list):
-                check(obj, expected_fields, subset)
-                return
-
-            for o in obj:
-                check(o, expected_fields, subset)
-
-    def check_field_values(self, expected_field_values: dict, nested_fields: list = None):
-        def check(obj, expected_field_values: dict):
-            for field_key, field_value in expected_field_values.items():
-                assert field_key in obj.keys(), f'Отсутствует поле "{field_key}"'
-
-                assert obj.get(field_key) == field_value, \
-                    f'Поле "{field_key}": {obj.get(field_key)}(фактический) != {field_value}(ожидаемый)'
-
-        with qase.step(f'Проверить значения полей ответа: {expected_field_values}',
-                       expected='Значения полей ожидаемые'):
-            obj = self.json() if nested_fields is None else self.__get_nested_object(nested_fields)
-            if not isinstance(obj, list):
-                check(obj, expected_field_values)
-                return
-
-            for o in obj:
-                check(o, expected_field_values)
-
-    def check_object_count(self, field_name: str, expected_count: int, nested_fields: list = None):
-        def check(obj, field_name: str, expected_count: int):
-            assert field_name in obj.keys(), f'Отсутствует поле "{field_name}"'
-
-            actual_count = len(obj.get(field_name))
-            assert actual_count == expected_count, \
-                f'кол-во элементов в поле "{field_name}": {actual_count}(фактическое) != {expected_count}(ожидаемое)'
-
-        with qase.step(f'Проверить количество элементов в ответе в поле "{field_name}', expected=f'{expected_count}'):
-            obj = self.json() if nested_fields is None else self.__get_nested_object(nested_fields)
-            if not isinstance(obj, list):
-                check(obj, field_name, expected_count)
-                return
-
-            for o in obj:
-                check(o, field_name, expected_count)
-
-    def __get_nested_object(self, nested_fields: list):
-        nested_object = self.json()
-        for field in nested_fields:
-            nested_object = nested_object.get(field)
-
-        return nested_object
+            return [self.json()]
+        except AttributeError:
+            assert False, f"Некорректное тело ответа: {self.response.text}"
 
 
 class Kinopoisk:
@@ -175,15 +123,16 @@ class Kinopoisk:
 
         return ResponseKp(response=resp)
 
-    def movie_random(self, token: str = None, timeout: int = None) -> ResponseKp:
+    def movie_random(self, query_params: dict = None, token: str = None, timeout: int = None) -> ResponseKp:
         """
         Этот метод вернет рандомный тайтл из базы.
         Вы можете составить фильтр, чтобы получить рандомный тайтл по вашим критериям.
+        :param query_params:
         :param token:
         :param timeout:
         :return:
         """
-        resp = self.__get(path=self.__get_path_by_caller_function(), token=token, timeout=timeout)
+        resp = self.__get(path=self.__get_path_by_caller_function(), query_params=query_params, token=token, timeout=timeout)
 
         return ResponseKp(response=resp)
 
