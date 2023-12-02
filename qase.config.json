@@ -17,8 +17,7 @@
 			"host": "qase.io"
 		},
 		"run": {
-            "id": 5,
-			"complete": false
+			"complete": true
 		},
 		"defect": true,
 		"project": "API",
