@@ -6,7 +6,7 @@ endpoints:
     path: "movie"
     ver: "v1.4"
   movie_id:
-    path: "movie/{id}" # movie/{id}
+    path: "movie/{id}"
     ver: "v1.4"
   movie_random:
     path: "movie/random"
