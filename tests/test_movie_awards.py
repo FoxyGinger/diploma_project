@@ -1,3 +1,6 @@
+"""
+Тесты для метода movie/awards
+"""
 from kinopoisk.kinopoisk import *
 
 
@@ -13,10 +16,15 @@ from kinopoisk.kinopoisk import *
     ("automation", "automated")
 )
 def test_movie_awards(kinopoisk: Kinopoisk):
+    """
+    Получение списка наград тайтлов без параметров
+    :param kinopoisk:
+    :return:
+    """
     award_fields = {"movieId", "nomination"}
     resp = kinopoisk.movie_awards()
     resp.check_response_code(200)
-    with qase.step(f'Проверить, что вернулся список номинаций', expected=f'Элементы содержат поля: {award_fields}'):
+    with qase.step('Проверить, что вернулся список номинаций', expected=f'Элементы содержат поля: {award_fields}'):
         for award in resp.get_awards():
             assert award_fields <= award.keys(), f'есть элементы, которые не содержат поля: "{award_fields}"'
 
@@ -33,6 +41,11 @@ def test_movie_awards(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_awards_winning(kinopoisk: Kinopoisk):
+    """
+    Получение только списка наград с победами
+    :param kinopoisk:
+    :return:
+    """
     winning = True
     resp = kinopoisk.movie_awards(query_params={"winning": winning})
     resp.check_response_code(200)
@@ -54,6 +67,11 @@ def test_movie_awards_winning(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_awards_title(kinopoisk: Kinopoisk):
+    """
+    Получение определенного списка номинаций
+    :param kinopoisk:
+    :return:
+    """
     nomination_title = "Венецианский кинофестиваль"
     resp = kinopoisk.movie_awards(query_params={"nomination.title": nomination_title})
     resp.check_response_code(200)
@@ -75,6 +93,11 @@ def test_movie_awards_title(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_awards_award_title(kinopoisk: Kinopoisk):
+    """
+    Получение определенного списка номинаций по наградам
+    :param kinopoisk:
+    :return:
+    """
     nomination_award_title = "Оскар"
     resp = kinopoisk.movie_awards(query_params={"nomination.award.title": nomination_award_title})
     resp.check_response_code(200)
@@ -96,6 +119,11 @@ def test_movie_awards_award_title(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_awards_award_year(kinopoisk: Kinopoisk):
+    """
+    Получение определенного списка номинаций по году награды
+    :param kinopoisk:
+    :return:
+    """
     nomination_award_year = 2021
     resp = kinopoisk.movie_awards(query_params={"nomination.award.year": nomination_award_year})
     resp.check_response_code(200)
@@ -117,6 +145,11 @@ def test_movie_awards_award_year(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_awards_award_year_1900(kinopoisk: Kinopoisk):
+    """
+    Получение определенного списка номинаций по году награды 1900
+    :param kinopoisk:
+    :return:
+    """
     nomination_award_year = 1900
     resp = kinopoisk.movie_awards(query_params={"nomination.award.year": nomination_award_year})
     resp.check_response_code(200)
@@ -138,6 +171,11 @@ def test_movie_awards_award_year_1900(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_awards_award_year_1899(kinopoisk: Kinopoisk):
+    """
+    Получение определенного списка номинаций по году награды 1899
+    :param kinopoisk:
+    :return:
+    """
     nomination_award_year = 1899
     resp = kinopoisk.movie_awards(query_params={"nomination.award.year": nomination_award_year})
     resp.check_response_code(400)
@@ -155,6 +193,11 @@ def test_movie_awards_award_year_1899(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_awards_award_year_3333(kinopoisk: Kinopoisk):
+    """
+    Получение определенного списка номинаций по году награды 3333
+    :param kinopoisk:
+    :return:
+    """
     nomination_award_year = 3333
     resp = kinopoisk.movie_awards(query_params={"nomination.award.year": nomination_award_year})
     resp.check_response_code(400)

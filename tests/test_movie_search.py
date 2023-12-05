@@ -1,3 +1,6 @@
+"""
+Тесты для метода movie/search
+"""
 from kinopoisk.kinopoisk import *
 
 
@@ -13,6 +16,11 @@ from kinopoisk.kinopoisk import *
     ("automation", "automated")
 )
 def test_movie_search_ru(kinopoisk: Kinopoisk):
+    """
+    Получение фильма по названию на русском
+    :param kinopoisk:
+    :return:
+    """
     text = "гром"
     resp = kinopoisk.movie_search(text=text)
     resp.check_response_code(200)
@@ -39,6 +47,11 @@ def test_movie_search_ru(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_search_eng(kinopoisk: Kinopoisk):
+    """
+    Получение фильма по названию на английском
+    :param kinopoisk:
+    :return:
+    """
     text = "war"
     resp = kinopoisk.movie_search(text=text)
     resp.check_response_code(200)

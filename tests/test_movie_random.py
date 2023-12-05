@@ -1,8 +1,7 @@
+"""
+Тесты для метода movie/random
+"""
 from kinopoisk.kinopoisk import *
-
-movie_id = 22222
-invalid_movie_id = "12845%$"
-invalid_token = "invalid_token"
 
 
 @qase.id(30)
@@ -17,6 +16,11 @@ invalid_token = "invalid_token"
     ("automation", "automated")
 )
 def test_movie_random(kinopoisk: Kinopoisk):
+    """
+    Получение рандомного тайтла из базы
+    :param kinopoisk:
+    :return:
+    """
     resp1 = kinopoisk.movie_random()
     resp1.check_response_code(200)
     first_id = resp1.get_movies()[0].get("id")
@@ -39,6 +43,11 @@ def test_movie_random(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_random_platform(kinopoisk: Kinopoisk):
+    """
+    Получение рандомного тайтла по доступным платформам для просмотра
+    :param kinopoisk:
+    :return:
+    """
     watchability_items_name = "okko"
     resp = kinopoisk.movie_random(query_params={"watchability.items.name": watchability_items_name})
     resp.check_response_code(200)
@@ -65,6 +74,11 @@ def test_movie_random_platform(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_random_rating_kp_7_10(kinopoisk: Kinopoisk):
+    """
+    Получение рандомного тайтла по рейтингу Кинопоиск от 7 до 10
+    :param kinopoisk:
+    :return:
+    """
     rating_1 = 7
     rating_2 = 10
     resp = kinopoisk.movie_random(query_params={

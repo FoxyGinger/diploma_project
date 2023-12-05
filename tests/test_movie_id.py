@@ -1,9 +1,12 @@
+"""
+Тесты для метода movie/{id}
+"""
 from kinopoisk.kinopoisk import *
 
 
 @qase.id(1)
-@qase.suite("Поиск фильма по id (фильмы, сериалы)")
 @qase.title("Получение фильма по существующему корректно заданному id")
+@qase.suite("Поиск фильма по id (фильмы, сериалы)")
 @qase.fields(
     ("severity", "normal"),
     ("priority", "medium"),
@@ -13,6 +16,11 @@ from kinopoisk.kinopoisk import *
     ("automation", "automated")
 )
 def test_movie_id(kinopoisk: Kinopoisk):
+    """
+    Получение фильма по существующему корректно заданному id
+    :param kinopoisk:
+    :return:
+    """
     movie_id = 22222
     resp = kinopoisk.movie_id(movie_id=movie_id)
     resp.check_response_code(200)
@@ -22,8 +30,8 @@ def test_movie_id(kinopoisk: Kinopoisk):
 
 
 @qase.id(2)
-@qase.suite("Поиск фильма по id (фильмы, сериалы)")
 @qase.title("Получение фильма по некорректно заданному id")
+@qase.suite("Поиск фильма по id (фильмы, сериалы)")
 @qase.fields(
     ("severity", "normal"),
     ("priority", "medium"),
@@ -33,14 +41,19 @@ def test_movie_id(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_id_invalid_id(kinopoisk: Kinopoisk):
+    """
+    Получение фильма по некорректно заданному id
+    :param kinopoisk:
+    :return:
+    """
     invalid_movie_id = "12845%$"
     resp = kinopoisk.movie_id(movie_id=invalid_movie_id)
     resp.check_response_code(400)
 
 
 @qase.id(4)
-@qase.suite("Поиск фильма по id (фильмы, сериалы)")
 @qase.title("Получение фильма без авторизации")
+@qase.suite("Поиск фильма по id (фильмы, сериалы)")
 @qase.fields(
     ("severity", "normal"),
     ("priority", "medium"),
@@ -50,6 +63,11 @@ def test_movie_id_invalid_id(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_id_invalid_token(kinopoisk: Kinopoisk):
+    """
+    Получение фильма без авторизации
+    :param kinopoisk:
+    :return:
+    """
     movie_id = 22222
     invalid_token = "invalid_token"
     resp = kinopoisk.movie_id(movie_id=movie_id, token=invalid_token)
@@ -68,6 +86,11 @@ def test_movie_id_invalid_token(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_id_another_page(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов не на первой странице
+    :param kinopoisk:
+    :return:
+    """
     page1 = 2
     resp1 = kinopoisk.movie(query_params={
         "page": page1
@@ -96,12 +119,17 @@ def test_movie_id_another_page(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_id_page_limit(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов c измененным количеством элементов на странице
+    :param kinopoisk:
+    :return:
+    """
     limit = 13
     resp = kinopoisk.movie(query_params={
         "limit": limit
     })
     resp.check_response_code(200)
-    with qase.step(f'Проверить, что параметр "limit", совпадает с запрошенным', expected='"limit" совпадают'):
+    with qase.step('Проверить, что параметр "limit", совпадает с запрошенным', expected='"limit" совпадают'):
         assert resp.json().get('limit') == limit, f'"limit" не совпадают: {resp.json().get("limit")}(actual) != {limit}(expected)'
     movies = resp.get_movies()
     with qase.step("Проверить кол-во полученных элементов", expected=f"кол-во элементов равно {limit}"):

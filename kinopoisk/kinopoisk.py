@@ -1,3 +1,6 @@
+"""
+Описывает основные класса для работы с API
+"""
 import inspect
 
 import requests
@@ -5,6 +8,9 @@ from qaseio.pytest import qase
 
 
 class ResponseKp:
+    """
+    Обертка над requests.Response
+    """
     response: requests.Response
 
     def __init__(self, response: requests.Response):
@@ -12,27 +18,57 @@ class ResponseKp:
 
     @property
     def status_code(self) -> int:
+        """
+        status_code
+        :return:
+        """
         return self.response.status_code
 
     @property
     def url(self) -> str:
+        """
+        url
+        :return:
+        """
         return self.response.url
 
     def json(self) -> dict:
+        """
+        json body response
+        :return:
+        """
         return self.response.json()
 
     def check_response_code(self, expected_code: int):
-        with qase.step(f'Проверить статус кода ответа', expected=f'{expected_code}'):
+        """
+        check response code
+        :param expected_code:
+        :return:
+        """
+        with qase.step('Проверить статус кода ответа', expected=f'{expected_code}'):
             assert self.status_code == expected_code, \
                 f'Код ответа на "{self.url}" {self.status_code}(фактический) != {expected_code}(ожидаемый)'
 
     def get_movies(self) -> list:
+        """
+        get movies
+        :return:
+        """
         return self.__get_objects_by_type("movie")
 
     def get_awards(self) -> list:
+        """
+        get awards
+        :return:
+        """
         return self.__get_objects_by_type("awards")
 
     def __get_objects_by_type(self, object_type: str) -> list:
+        """
+        get objects by type
+        :param object_type:
+        :return:
+        """
         assert object_type in self.response.url, f'запрос не относился к "{object_type}": {self.response.url}'
         try:
             assert len(self.json().keys()) > 0, f"Некорректное тело ответа: {self.json()}"
@@ -45,6 +81,9 @@ class ResponseKp:
 
 
 class Kinopoisk:
+    """
+    API клиент
+    """
     __main_url: str
     __endpoints: dict
     __token: str
@@ -55,7 +94,6 @@ class Kinopoisk:
         Обертка клиента api.kinopoisk.dev
         :param config: словарь с параметрами
         """
-        self.__config = config
         self.__main_url = config.get("server")
         self.__token = config.get("token")
         self.__endpoints = config.get("endpoints")

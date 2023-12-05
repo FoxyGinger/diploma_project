@@ -1,7 +1,10 @@
+"""
+Тесты для метода movie
+"""
 from kinopoisk.kinopoisk import *
 
-first_year = 1874
-last_year = 2050
+FIRST_YEAR = 1874
+LAST_YEAR = 2050
 
 
 @qase.id(6)
@@ -16,6 +19,11 @@ last_year = 2050
     ("automation", "automated")
 )
 def test_movie(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов без параметров
+    :param kinopoisk:
+    :return:
+    """
     resp = kinopoisk.movie()
     resp.check_response_code(200)
     movies = resp.get_movies()
@@ -23,8 +31,8 @@ def test_movie(kinopoisk: Kinopoisk):
         assert len(movies) > 0, "Фильмов нет"
 
     with qase.step("Проверить уникальность id фильмов", expected="Уникальны"):
-        ids = set([movie['id'] for movie in movies])
-        assert len(ids) == len(movies), f'В ответе есть повторящиеся id'
+        ids = set(movie['id'] for movie in movies)
+        assert len(ids) == len(movies), 'В ответе есть повторящиеся id'
 
 
 @qase.id(296)
@@ -39,6 +47,11 @@ def test_movie(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_selected_fields(kinopoisk: Kinopoisk):
+    """
+    Получение выбранных полей в фильмах
+    :param kinopoisk:
+    :return:
+    """
     selected_fields = ['name', 'type', 'year', 'genres', 'countries', 'rating']
     resp = kinopoisk.movie(query_params={"selectFields": selected_fields})
     resp.check_response_code(200)
@@ -61,6 +74,11 @@ def test_movie_selected_fields(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_non_existent_page(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов с указанием несуществующей страницы
+    :param kinopoisk:
+    :return:
+    """
     page = 9999999
     resp = kinopoisk.movie(query_params={"page": page})
     resp.check_response_code(400)
@@ -78,6 +96,11 @@ def test_movie_non_existent_page(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_sort_year_asc(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов с сортировкой по году по возрастанию
+    :param kinopoisk:
+    :return:
+    """
     resp = kinopoisk.movie(query_params={
         "sortField": "year",
         "sortType": 1,
@@ -91,8 +114,8 @@ def test_movie_sort_year_asc(kinopoisk: Kinopoisk):
 
         for movie in movies[1:]:
             current_movie_year = movie.get('year')
-            assert year > 0, f"год нулевой"
-            assert year <= current_movie_year, f"года идут не по возрастанию"
+            assert year > 0, "год нулевой"
+            assert year <= current_movie_year, "года идут не по возрастанию"
             year = current_movie_year
 
 
@@ -108,6 +131,11 @@ def test_movie_sort_year_asc(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_sort_year_desc(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов с сортировкой по году по убыванию
+    :param kinopoisk:
+    :return:
+    """
     resp = kinopoisk.movie(query_params={
         "sortField": "year",
         "sortType": -1,
@@ -121,8 +149,8 @@ def test_movie_sort_year_desc(kinopoisk: Kinopoisk):
 
         for movie in movies[1:]:
             current_movie_year = movie.get('year')
-            assert year > 0, f"год нулевой"
-            assert year >= current_movie_year, f"года идут не по убыванию"
+            assert year > 0, "год нулевой"
+            assert year >= current_movie_year, "года идут не по убыванию"
             year = current_movie_year
 
 
@@ -138,6 +166,11 @@ def test_movie_sort_year_desc(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_sort_rating_kp_asc(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов с сортировкой по рейтингу Кинопоиск по возрастанию из топ-10
+    :param kinopoisk:
+    :return:
+    """
     resp = kinopoisk.movie(query_params={
         "sortField": "rating.kp",
         "sortType": 1,
@@ -148,7 +181,7 @@ def test_movie_sort_rating_kp_asc(kinopoisk: Kinopoisk):
     with qase.step('Проверить сортировку по возрастанию по полю "rating.kp"', expected="rating.kp идут по возрастанию"):
         for movie in movies[1:]:
             current_movie_rating_kp = movie.get('rating').get('kp')
-            assert rating_kp <= current_movie_rating_kp, f"рейтинги идут не по возрастанию"
+            assert rating_kp <= current_movie_rating_kp, "рейтинги идут не по возрастанию"
             rating_kp = current_movie_rating_kp
 
 
@@ -164,6 +197,11 @@ def test_movie_sort_rating_kp_asc(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_sort_rating_kp_desc(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов с сортировкой по рейтингу Кинопоиск по убыванию из топ-10
+    :param kinopoisk:
+    :return:
+    """
     resp = kinopoisk.movie(query_params={
         "sortField": "rating.kp",
         "sortType": -1,
@@ -174,7 +212,7 @@ def test_movie_sort_rating_kp_desc(kinopoisk: Kinopoisk):
     with qase.step('Проверить сортировку по убыванию по полю "rating.kp"', expected="rating.kp идут по возрастанию"):
         for movie in movies[1:]:
             current_movie_rating_kp = movie.get('rating').get('kp')
-            assert rating_kp >= current_movie_rating_kp, f"рейтинги идут не по убыванию"
+            assert rating_kp >= current_movie_rating_kp, "рейтинги идут не по убыванию"
             rating_kp = current_movie_rating_kp
 
 
@@ -190,14 +228,19 @@ def test_movie_sort_rating_kp_desc(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_valid_first_year(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов по году с нижней границы
+    :param kinopoisk:
+    :return:
+    """
     resp = kinopoisk.movie(query_params={
-        "year": first_year})
+        "year": FIRST_YEAR})
     resp.check_response_code(200)
     movies = resp.get_movies()
-    with qase.step(f'Проверить, что год в фильмах равен {first_year}', expected=f"Все фильмы {first_year} года"):
+    with qase.step(f'Проверить, что год в фильмах равен {FIRST_YEAR}', expected=f"Все фильмы {FIRST_YEAR} года"):
         for movie in movies:
             year = movie.get('year')
-            assert year == first_year, f"{year} != {first_year}"
+            assert year == FIRST_YEAR, f"{year} != {FIRST_YEAR}"
 
 
 @qase.id(19)
@@ -212,14 +255,19 @@ def test_movie_valid_first_year(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_valid_last_year(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов по году с верхней границы
+    :param kinopoisk:
+    :return:
+    """
     resp = kinopoisk.movie(query_params={
-        "year": last_year})
+        "year": LAST_YEAR})
     resp.check_response_code(200)
     movies = resp.get_movies()
-    with qase.step(f'Проверить, что год в фильмах равен {last_year}', expected=f"Все фильмы {last_year} года"):
+    with qase.step(f'Проверить, что год в фильмах равен {LAST_YEAR}', expected=f"Все фильмы {LAST_YEAR} года"):
         for movie in movies:
             year = movie.get('year')
-            assert year == last_year, f"{year} != {last_year}"
+            assert year == LAST_YEAR, f"{year} != {LAST_YEAR}"
 
 
 @qase.id(314)
@@ -234,7 +282,12 @@ def test_movie_valid_last_year(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_valid_first_year_1(kinopoisk: Kinopoisk):
-    valid_year = first_year + 1
+    """
+    Получение фильмов по году с нижней границы + 1
+    :param kinopoisk:
+    :return:
+    """
+    valid_year = FIRST_YEAR + 1
     resp = kinopoisk.movie(query_params={
         "year": valid_year})
     resp.check_response_code(200)
@@ -257,7 +310,12 @@ def test_movie_valid_first_year_1(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_valid_last_year_1(kinopoisk: Kinopoisk):
-    valid_year = last_year - 1
+    """
+    Получение фильмов по году с верхней границы - 1
+    :param kinopoisk:
+    :return:
+    """
+    valid_year = LAST_YEAR - 1
     resp = kinopoisk.movie(query_params={
         "year": valid_year})
     resp.check_response_code(200)
@@ -280,7 +338,12 @@ def test_movie_valid_last_year_1(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_invalid_first_year(kinopoisk: Kinopoisk):
-    invalid_year = first_year - 1
+    """
+    Получение фильмов по году за нижней границей
+    :param kinopoisk:
+    :return:
+    """
+    invalid_year = FIRST_YEAR - 1
     resp = kinopoisk.movie(query_params={
         "year": invalid_year})
     resp.check_response_code(400)
@@ -298,7 +361,12 @@ def test_movie_invalid_first_year(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_invalid_last_year(kinopoisk: Kinopoisk):
-    invalid_year = last_year + 1
+    """
+    Получение фильмов по году за верхней границей
+    :param kinopoisk:
+    :return:
+    """
+    invalid_year = LAST_YEAR + 1
     resp = kinopoisk.movie(query_params={
         "year": invalid_year})
     resp.check_response_code(400)
@@ -316,6 +384,11 @@ def test_movie_invalid_last_year(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_by_genre(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов по жанрам
+    :param kinopoisk:
+    :return:
+    """
     genre = "комедия"
     resp = kinopoisk.movie(query_params={
         "genre.name": genre})
@@ -344,6 +417,11 @@ def test_movie_by_genre(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_by_two_genres(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов по нескольким жанрам
+    :param kinopoisk:
+    :return:
+    """
     genre1 = "комедия"
     genre2 = "криминал"
     resp = kinopoisk.movie(query_params={
@@ -379,6 +457,11 @@ def test_movie_by_two_genres(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_by_two_genres_ex(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов по жанру и исключающему жанру
+    :param kinopoisk:
+    :return:
+    """
     genre1 = "комедия"
     genre2 = "криминал"
     resp = kinopoisk.movie(query_params={
@@ -412,6 +495,11 @@ def test_movie_by_two_genres_ex(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_rating_kp_0_10(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов по рейтингу Кинопоиска от 0 до 10
+    :param kinopoisk:
+    :return:
+    """
     rating_1 = 0
     rating_2 = 10
     resp = kinopoisk.movie(query_params={
@@ -438,6 +526,11 @@ def test_movie_rating_kp_0_10(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_rating_kp_1_5(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов по рейтингу Кинопоиска от 1 до 5
+    :param kinopoisk:
+    :return:
+    """
     rating_1 = 1
     rating_2 = 5
     resp = kinopoisk.movie(query_params={
@@ -464,6 +557,11 @@ def test_movie_rating_kp_1_5(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_rating_kp_9_10(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов по рейтингу Кинопоиска от 9 до 10
+    :param kinopoisk:
+    :return:
+    """
     rating_1 = 9
     rating_2 = 10
     resp = kinopoisk.movie(query_params={
@@ -490,6 +588,11 @@ def test_movie_rating_kp_9_10(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_rating_kp_10(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов по рейтингу Кинопоиска 10
+    :param kinopoisk:
+    :return:
+    """
     rating = 10
     resp = kinopoisk.movie(query_params={
         "rating.kp": rating
@@ -514,6 +617,11 @@ def test_movie_rating_kp_10(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_rating_kp_10_11(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов по рейтингу Кинопоиска от 10 до 11
+    :param kinopoisk:
+    :return:
+    """
     rating_1 = 10
     rating_2 = 11
     resp = kinopoisk.movie(query_params={
@@ -534,6 +642,11 @@ def test_movie_rating_kp_10_11(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_rating_kp_1_0(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов по рейтингу Кинопоиска от -1 до 0
+    :param kinopoisk:
+    :return:
+    """
     rating_1 = -1
     rating_2 = 0
     resp = kinopoisk.movie(query_params={
@@ -554,6 +667,11 @@ def test_movie_rating_kp_1_0(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_by_type(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов по типу фильма с валидным значением
+    :param kinopoisk:
+    :return:
+    """
     movie_type = "cartoon"
     resp = kinopoisk.movie(query_params={
         "type": movie_type
@@ -578,25 +696,11 @@ def test_movie_by_type(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_by_invalid_type(kinopoisk: Kinopoisk):
-    movie_type = "телесериал"
-    resp = kinopoisk.movie(query_params={
-        "type": movie_type
-    })
-    resp.check_response_code(400)
-
-
-@qase.id(306)
-@qase.title("Получение фильмов по типу с невалидным значением")
-@qase.suite("Поиск фильма с фильтрами (фильмы, сериалы)")
-@qase.fields(
-    ("severity", "normal"),
-    ("priority", "medium"),
-    ("behavior", "negative"),
-    ("type", "regression"),
-    ("layer", "api"),
-    ("automation", "automated")
-)
-def test_movie_by_invalid_type(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов по типу с невалидным значением
+    :param kinopoisk:
+    :return:
+    """
     movie_type = "телесериал"
     resp = kinopoisk.movie(query_params={
         "type": movie_type
@@ -616,6 +720,11 @@ def test_movie_by_invalid_type(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_by_country(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов по стране
+    :param kinopoisk:
+    :return:
+    """
     country_name = "Россия"
     resp = kinopoisk.movie(query_params={
         "countries.name": country_name
@@ -646,6 +755,11 @@ def test_movie_by_country(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_by_age(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов по возрастному рейтингу
+    :param kinopoisk:
+    :return:
+    """
     age_rating = 6
     resp = kinopoisk.movie(query_params={
         "ageRating": age_rating
@@ -672,6 +786,11 @@ def test_movie_by_age(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_by_duration_70_90(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов по продолжительности фильма от 70 до 90 мин
+    :param kinopoisk:
+    :return:
+    """
     duration_first = 70
     duration_last = 90
     resp = kinopoisk.movie(query_params={
@@ -679,7 +798,7 @@ def test_movie_by_duration_70_90(kinopoisk: Kinopoisk):
     })
     resp.check_response_code(200)
     with qase.step(f'Проверить, что у фильмов продолжительность от {duration_first} до {duration_last} мин',
-                   expected=f'У всех фильмов продолжительность попадает в диапазон'):
+                   expected='У всех фильмов продолжительность попадает в диапазон'):
         movies = resp.get_movies()
         for movie in movies:
             current_duration = movie.get('movieLength')
@@ -699,6 +818,11 @@ def test_movie_by_duration_70_90(kinopoisk: Kinopoisk):
     ("automation", "automated")
 )
 def test_movie_by_duration_negative(kinopoisk: Kinopoisk):
+    """
+    Получение фильмов по продолжительности фильма -1
+    :param kinopoisk:
+    :return:
+    """
     duration = -1
     resp = kinopoisk.movie(query_params={
         "movieLength": duration

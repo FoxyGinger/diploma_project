@@ -1,3 +1,6 @@
+"""
+Файл содержит основные фикстуры для тестов
+"""
 import os
 import sys
 
@@ -6,27 +9,32 @@ import yaml
 
 from kinopoisk.kinopoisk import Kinopoisk
 
-config_file = "config.yaml"
+CONFIG_FILE = "config.yaml"
 
 
 @pytest.fixture()
 def config() -> dict:
+    """
+    Фикстура представляет собой словарь с параметрами для тестов
+    """
     os.chdir(os.path.dirname(__file__))
-    config: dict = {}
-    if not os.path.exists(config_file):
-        print(f'Warning! Config file "{config_file}" is not exists', file=sys.stderr)
+    cfg: dict = {}
+    if not os.path.exists(CONFIG_FILE):
+        print(f'Warning! Config file "{CONFIG_FILE}" is not exists', file=sys.stderr)
 
-    with open(config_file) as file:
-        config = yaml.safe_load(file)
+    with open(CONFIG_FILE, encoding="utf-8") as file:
+        cfg = yaml.safe_load(file)
 
-    if len(config) == 0:
-        raise ValueError(f'Config is invalid! Check config file "{config_file}"')
+    if len(cfg) == 0:
+        raise ValueError(f'Config is invalid! Check config file "{CONFIG_FILE}"')
 
-    yield config
+    yield cfg
 
 
 @pytest.fixture()
 def kinopoisk(config: dict) -> Kinopoisk:
-    kinopoisk = Kinopoisk(config)
-    yield kinopoisk
-
+    """
+    Фикстура представляет собой объект класса Kinopoisk
+    """
+    kp = Kinopoisk(config)
+    yield kp
