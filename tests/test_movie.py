@@ -208,6 +208,7 @@ def test_movie_sort_rating_kp_desc(kinopoisk: Kinopoisk):
         "notNullFields": "top10"})
     resp.check_response_code(200)
     movies = resp.get_movies()
+    assert len(movies) > 0, "Список фильмов пуст"
     rating_kp = movies[0].get('rating').get('kp')
     with qase.step('Проверить сортировку по убыванию по полю "rating.kp"', expected="rating.kp идут по возрастанию"):
         for movie in movies[1:]:
