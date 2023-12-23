@@ -1,6 +1,8 @@
 """
 Тесты для метода movie
 """
+import pytest
+
 from kinopoisk.kinopoisk import *
 
 FIRST_YEAR = 1874
@@ -196,6 +198,7 @@ def test_movie_sort_rating_kp_asc(kinopoisk: Kinopoisk):
     ("layer", "api"),
     ("automation", "automated")
 )
+@pytest.mark.smoke
 def test_movie_sort_rating_kp_desc(kinopoisk: Kinopoisk):
     """
     Получение фильмов с сортировкой по рейтингу Кинопоиск по убыванию из топ-10
